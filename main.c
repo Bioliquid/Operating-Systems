@@ -34,7 +34,7 @@ int execute(char **args) {
 char **split_args(char *args) {
 	size_t token_capacity = 8;
 	size_t position = 0;
-	char **tokens = (char **)malloc(token_capacity * sizeof(char*));
+	char **tokens = (char**)malloc(token_capacity * sizeof(char*));
 	char *token;
 	
 	if (!tokens) {
@@ -57,6 +57,7 @@ char **split_args(char *args) {
 
 		token = strtok(NULL, " \t\n");
 	}
+	tokens = realloc(tokens, (position + 1) * sizeof(char*));
 	tokens[position] = NULL;
 	return tokens;
 }
@@ -78,8 +79,6 @@ int main() {
 	enum status { FAILURE, SUCCESS };
 	enum status current_status = SUCCESS;
 	
-	size_t lenth = 0;
-
 	do {
 		printf("> ");
 		line = read_args();
