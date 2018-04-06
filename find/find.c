@@ -10,6 +10,48 @@
 #include <ctype.h>
 #include <sys/types.h>
 
+//find conditions declaration
+bool has_name = false;
+char *name = "";
+
+bool has_exec_file = false;
+char *exec_file = "";
+
+bool has_size = false;
+char sign = '\0';
+off_t size = 0;
+
+bool has_nlink = false;
+nlink_t nlink = 0;
+
+bool has_inode = false;
+ino_t inode = 0;
+
+
+int filter(struct stat file_stat, char *filename) {
+    if (has_name == true && strcmp(filename, name) != 0) {
+		return 0;
+	}
+	if (has_inode == true && inode != file_stat.st_ino) {
+		return 0;
+	}
+	if(has_nlink == true  && nlink != file_stat.st_nlink) {
+		return 0;
+	}
+	if(has_size == true) {
+		if(sign == '=' && size != file_stat.st_size) {
+			return 0;
+		}
+		if(sign == '+' && size >= file_stat.st_size) {
+			return 0;
+		}
+		if(sign == '-' && size <= file_stat.st_size) {
+			return 0;
+		}
+	}
+    return 1;
+}
+
 int launch(char *const* arg) {
 	extern char **environ;
 	pid_t pid = fork();
@@ -40,112 +82,64 @@ bool is_number(char *st) {
 	return true;
 }
 
-int parse(char ** argv) {
-	argv++;
-	DIR *directory;
-	struct dirent *dir;
+size_t length(char **arg) {
+	size_t len = 0;
+	for (; *arg++; ++len);
+	return len;
+}
 
-	if ((directory = opendir(*argv)) == NULL) {
-		perror("Failed to open directory");
+void help() {
+	printf("Function \'find\' takes odd number of arguments:\n");
+	printf("First argument is a path to search place\n");
+	printf("\'find\' can take several options:\n");
+	printf("\t\'-name\' takes a string which describes file name\n");
+	printf("\t\'-size\' takes a char followed by a positive integer which describes size of file\n");
+	printf("\t\t(+) - greater than size\n");
+	printf("\t\t(-) - less than size\n");
+	printf("\t\t(=) - equal to size\n");
+	printf("\t\'-inum\' takes a positive integer which describes inode of file\n");
+	printf("\t\'-nlinks\' takes a positive integer which describes number of hardlinks\n");
+	printf("\t\'-exec\' takes a string which describes a path to executable file\n");
+	exit(EXIT_FAILURE);
+}
+
+void listdir(char *dirpath) {
+	DIR *directory;
+	if ((directory = opendir(dirpath)) == NULL) {
+		printf("Failed to open directory %s: %d\n", dirpath, errno);
+		if (closedir(directory) == -1) {
+			printf("Failed to close directory %s: %d\n", dirpath, errno);
+		}
 		exit(EXIT_FAILURE);
 	}
 	char directory_path[1024];
 	
-	if (strcmp(*argv, ".") != 0) {
-		strcpy(directory_path, *argv);
+	if (strcmp(dirpath, ".") != 0) {
+		strcpy(directory_path, dirpath);
 		strcat(directory_path, "/");
 	} else {
 		directory_path[0] = '\0';
 	}
-	argv++;
 
-	bool has_name = false;
-	char *name = "";
-
-	bool has_exec_file = false;
-	char *exec_file = "";
-
-	bool has_size = false;
-	char sign = '\0';
-	off_t size = 0;
-
-	bool has_nlink = false;
-	nlink_t nlink = 0;
-
-	bool has_inode = false;
-	ino_t inode = 0;
-	while (*argv) {
-		if (strcmp(*argv, "-name") == 0) {
-			argv++;
-			has_name = true;
-			name = *argv;	
-		} else if(strcmp(*argv, "-size") == 0) {
-			argv++;
-			char * pointer = *argv + 1;
-			if (is_number(pointer) == false) {
-				printf("Invalid \'size\' argument\n");
-				exit(EXIT_FAILURE);
-			}
-			has_size = true;
-			sign = **argv;
-			size = atoll(pointer);
-		} else if(strcmp(*argv, "-inum") == 0) {
-			argv++;
-			if (is_number(*argv) == false) {
-				printf("Invalid \'inode\' argument\n");
-				exit(EXIT_FAILURE);
-			}
-			has_inode = true;
-			inode = strtoul(*argv, 0L, 10);
-		} else if(strcmp(*argv, "-nlinks") == 0) {
-			argv++;
-			if (is_number(*argv) == false) {
-				printf("Invalid \'number of hardlinks\' argument\n");
-				exit(EXIT_FAILURE);
-			}
-			has_nlink = true;
-			nlink = strtoul(*argv, 0L, 10);
-		} else if(strcmp(*argv, "-exec") == 0) {
-			argv++;
-			has_exec_file = true;
-			exec_file = *argv;
-		}
-		argv++;
-	}
+	struct dirent *dir;
 	while ((dir = readdir(directory)) != NULL) {
 		struct stat file_stat;
 		char file_path[1024];
 		strcpy(file_path, directory_path);
 		strcat(file_path, dir->d_name);
 		if (stat(file_path, &file_stat) == -1) {
-			perror("Failed to get files stats");
+			printf("Failed to get stat of file %s/%s: %d\n", dirpath, dir->d_name, errno);
 			exit(EXIT_FAILURE);
 		}
-		if (S_ISREG(file_stat.st_mode)) {
-			if (has_name == true && strcmp(dir->d_name, name) != 0) {
-				continue;
+		char newpath[1024];
+		snprintf(newpath, sizeof(newpath), "%s/%s", dirpath, dir->d_name);
+		if (dir->d_type == DT_DIR) {
+			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
+				listdir(newpath);
 			}
-			if (has_inode == true && inode != file_stat.st_ino) {
-				continue;
-			}
-			if(has_nlink == true  && nlink != file_stat.st_nlink) {
-				continue;
-			}
-
-			if(has_size == true) {
-				if(sign == '=' && size != file_stat.st_size) {
-					continue;
-				}
-				if(sign == '+' && size >= file_stat.st_size) {
-					continue;
-				}
-				if(sign == '-' && size <= file_stat.st_size) {
-					continue;
-				}
-			}
-
+		} else if (filter(file_stat, dir->d_name)) {
 			if(has_exec_file == true) {
-				char *const a[3] = {exec_file, file_path, (char*)0};
+				char *const a[3] = {exec_file, file_path, NULL};
 				launch(a);
 			} else {
 				printf("%s\n", file_path);	
@@ -154,14 +148,52 @@ int parse(char ** argv) {
 	}
 
 	if (closedir(directory) == -1) {
-		perror("Failed to close directory");
+		printf("Failed to close directory %s: %d\n", dirpath, errno);
 	}
-	return 1;
+}
+
+void parse(char **argv) {
+	char *dirpath = *argv;
+	++argv;
+
+	while (*argv) {
+		if (strcmp(*argv, "-name") == 0) {
+			++argv;
+			has_name = true;
+			name = *argv;	
+		} else if(strcmp(*argv, "-size") == 0) {
+			++argv;
+			char * pointer = *argv + 1;
+			has_size = true;
+			sign = **argv;
+			size = atoll(pointer);
+		} else if(strcmp(*argv, "-inum") == 0) {
+			++argv;
+			has_inode = true;
+			inode = strtoul(*argv, 0L, 10);
+		} else if(strcmp(*argv, "-nlinks") == 0) {
+			++argv;
+			has_nlink = true;
+			nlink = strtoul(*argv, 0L, 10);
+		} else if(strcmp(*argv, "-exec") == 0) {
+			++argv;
+			has_exec_file = true;
+			exec_file = *argv;
+		} else {
+			printf("Invalid argument %s\n", *argv);
+			help();
+		}
+		++argv;
+	}
+
+	listdir(dirpath);
 } 
 
-int main(int argc, char ** argv) {
-	
-	parse(argv);
+int main(int argc, char **argv) {
+	if (argc % 2 == 1) {
+		help();
+	}
+	parse(++argv);
 
 	return EXIT_SUCCESS;
 }
