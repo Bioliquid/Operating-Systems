@@ -117,7 +117,7 @@ void listdir(char *dirpath) {
 			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
 				listdir(file_path);
 			}
-		} else if (stat_fail || filter(file_stat, dir->d_name)) {
+		} else if (stat_fail == false && filter(file_stat, dir->d_name)) {
 			if(has_exec_file) {
 				char *const a[3] = {exec_file, file_path, NULL};
 				launch(a);
