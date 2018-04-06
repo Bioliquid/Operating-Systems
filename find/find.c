@@ -152,8 +152,9 @@ void parse(char **argv) {
 			name = *argv;	
 		} else if(strcmp(*argv, "-size") == 0) {
 			if (is_number(*(argv + 1)) == false) {
-				printf("Invalid number %s for argument %s", (argv + 1), argv);
+				printf("Invalid number %s for argument %s", *(argv + 1), *argv);
 			}
+			++argv;
 			char * pointer = *argv + 1;
 			has_size = true;
 			sign = **argv;
