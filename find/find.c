@@ -155,8 +155,8 @@ void parse(char **argv) {
 				printf("Invalid number %s for argument %s\n", *(argv + 1), *argv);
 				help();
 			}
-			++argv;
 			char *pointer = *(argv + 1) + 1;
+			++argv;
 			has_size = true;
 			sign = **argv;
 			if (sign != '-' && sign != '+' && sign != '=') {
