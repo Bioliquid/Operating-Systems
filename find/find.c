@@ -155,15 +155,24 @@ void parse(char **argv) {
 				printf("Invalid number %s for argument %s", *(argv + 1), *argv);
 			}
 			++argv;
-			char * pointer = *argv + 1;
+			char *pointer = *argv + 1;
 			has_size = true;
 			sign = **argv;
+			if (sign != '-' && sign != '+' && sign != '=') {
+				printf("invalid sign for argument -size");
+			}
 			size = atoll(pointer);
 		} else if(strcmp(*argv, "-inum") == 0) {
+			if (is_number(*(argv + 1)) == false) {
+				printf("Invalid number %s for argument %s", *(argv + 1), *argv);
+			}
 			++argv;
 			has_inode = true;
 			inode = strtoul(*argv, 0L, 10);
 		} else if(strcmp(*argv, "-nlinks") == 0) {
+			if (is_number(*(argv + 1)) == false) {
+				printf("Invalid number %s for argument %s", *(argv + 1), *argv);
+			}
 			++argv;
 			has_nlink = true;
 			nlink = strtoul(*argv, 0L, 10);
