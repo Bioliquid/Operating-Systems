@@ -95,7 +95,7 @@ void listdir(char *dirpath) {
 		if (closedir(directory) == -1) {
 			printf("Failed to close directory %s: %d\n", dirpath, errno);
 		}
-		exit(EXIT_FAILURE);
+		return;
 	}
 	char directory_path[1024];
 	
