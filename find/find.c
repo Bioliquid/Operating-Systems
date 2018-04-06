@@ -73,21 +73,6 @@ int launch(char *const* arg) {
 	return 1;
 }
 
-bool is_number(char *st) {
-	for (; *st; ++st) {
-		if (*st != 0 && !isdigit(*st)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-size_t length(char **arg) {
-	size_t len = 0;
-	for (; *arg++; ++len);
-	return len;
-}
-
 void help() {
 	printf("Function \'find\' takes odd number of arguments:\n");
 	printf("First argument is a path to search place\n");
