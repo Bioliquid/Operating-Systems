@@ -108,16 +108,17 @@ void listdir(char *dirpath) {
 		char file_path[1024];
 		strcpy(file_path, directory_path);
 		strcat(file_path, dir->d_name);
+		bool stat_fail = false;
 		if (stat(file_path, &file_stat) == -1) {
 			printf("Failed to get stat of file %s: %d\n", file_path, errno);
-			exit(EXIT_FAILURE);
+			stat_fail = true;
 		}
 		if (dir->d_type == DT_DIR) {
 			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
 				listdir(file_path);
 			}
-		} else if (filter(file_stat, dir->d_name)) {
-			if(has_exec_file == true) {
+		} else if (stat_fail || filter(file_stat, dir->d_name)) {
+			if(has_exec_file) {
 				char *const a[3] = {exec_file, file_path, NULL};
 				launch(a);
 			} else {
@@ -131,6 +132,15 @@ void listdir(char *dirpath) {
 	}
 }
 
+bool is_number(char *st) {
+	for (; *st; ++st) {
+		if (*st != 0 && !isdigit(*st)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void parse(char **argv) {
 	char *dirpath = *argv;
 	++argv;
@@ -141,7 +151,9 @@ void parse(char **argv) {
 			has_name = true;
 			name = *argv;	
 		} else if(strcmp(*argv, "-size") == 0) {
-			++argv;
+			if (is_number(*(argv + 1)) == false) {
+				printf("Invalid number %s for argument %s", (argv + 1), argv);
+			}
 			char * pointer = *argv + 1;
 			has_size = true;
 			sign = **argv;
