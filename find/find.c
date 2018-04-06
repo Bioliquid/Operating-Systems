@@ -156,7 +156,7 @@ void parse(char **argv) {
 				help();
 			}
 			++argv;
-			char *pointer = *argv + 1;
+			char *pointer = *(argv + 1) + 1;
 			has_size = true;
 			sign = **argv;
 			if (sign != '-' && sign != '+' && sign != '=') {
