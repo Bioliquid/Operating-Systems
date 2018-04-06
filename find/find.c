@@ -99,12 +99,8 @@ void listdir(char *dirpath) {
 	}
 	char directory_path[1024];
 	
-	if (strcmp(dirpath, ".") != 0) {
-		strcpy(directory_path, dirpath);
-		strcat(directory_path, "/");
-	} else {
-		directory_path[0] = '\0';
-	}
+	strcpy(directory_path, dirpath);
+	strcat(directory_path, "/");
 
 	struct dirent *dir;
 	while ((dir = readdir(directory)) != NULL) {
@@ -116,11 +112,9 @@ void listdir(char *dirpath) {
 			printf("Failed to get stat of file %s/%s: %d\n", dirpath, dir->d_name, errno);
 			exit(EXIT_FAILURE);
 		}
-		char newpath[1024];
-		snprintf(newpath, sizeof(newpath), "%s/%s", dirpath, dir->d_name);
 		if (dir->d_type == DT_DIR) {
 			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
-				listdir(newpath);
+				listdir(file_path);
 			}
 		} else if (filter(file_stat, dir->d_name)) {
 			if(has_exec_file == true) {
