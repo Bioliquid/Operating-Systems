@@ -109,7 +109,7 @@ void listdir(char *dirpath) {
 		strcpy(file_path, directory_path);
 		strcat(file_path, dir->d_name);
 		if (stat(file_path, &file_stat) == -1) {
-			printf("Failed to get stat of file %s/%s: %d\n", dirpath, dir->d_name, errno);
+			printf("Failed to get stat of file %s: %d\n", file_path, errno);
 			exit(EXIT_FAILURE);
 		}
 		if (dir->d_type == DT_DIR) {
