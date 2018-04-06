@@ -151,7 +151,7 @@ void parse(char **argv) {
 			has_name = true;
 			name = *argv;	
 		} else if(strcmp(*argv, "-size") == 0) {
-			if (is_number(*(argv + 1)) == false) {
+			if (is_number(*(argv + 1) + 1) == false) {
 				printf("Invalid number %s for argument %s\n", *(argv + 1), *argv);
 				help();
 			}
