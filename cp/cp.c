@@ -141,6 +141,9 @@ int cp(const char *from, const char *to) {
 					read_and_write(new_from, new_to);
 				}
 			}
+			if (closedir(directory) == -1) {
+				printf("Failed to close directory %s: %d\n", from, errno);
+			}
 		} else {
 			fprintf(stderr, "Failed to open directory %s: %d\n", from, errno);
 			perror("");
