@@ -14,10 +14,14 @@ int main() {
 	char * (*func)();
 	dynlib = dlopen("dynamic_rtlib.so", RTLD_LAZY);
 	if (!dynlib){
-		fprintf(stderr,"Can't open library dynamic_rtlib.so: %s\n", dlerror());
+		fprintf(stderr, "Can't open library dynamic_rtlib.so: %s\n", dlerror());
 		return 0;
 	};
 	func = dlsym(dynlib, "go");
+	if (!func) {
+		fprintf(stderr, "Can't get function: %s\n", dlerror());
+		return 0;
+	}
 	(*func)();
 	dlclose(dynlib);
 	return 0;
