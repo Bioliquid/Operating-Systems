@@ -32,7 +32,7 @@ IPv4_socket& IPv4_socket::operator=(IPv4_socket &&other) {
 }
 
 IPv4_socket::~IPv4_socket() {
-	this->close();
+	//this->close();
 }
 
 void IPv4_socket::create() {
@@ -106,9 +106,8 @@ std::string sock::recv(IPv4_socket &socket) {
 	const size_t buffer_length = 1024;
 	char buffer[buffer_length];
 	
-	socket.set_opt(SO_RCVTIMEO, sock::timelimit(1, 0));
+	//socket.set_opt(SO_RCVTIMEO, sock::timelimit(1, 0));
 	int recv_res = ::recv(fd, buffer, buffer_length, 0);	
-
 	if(recv_res == -1) {
 		perror("recv() error");
 		close(fd);

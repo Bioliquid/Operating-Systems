@@ -13,14 +13,15 @@ public:
 	~IPv4_session_impl() = default;
 
 	void close();
-	void send(IPv4_socket socket, std::string str);
+	std::string recv(IPv4_socket &socket);
+	void send(IPv4_socket &socket, std::string str);
 protected:
 	void send_impl(IPv4_socket socket, const char* buffer, size_t length);
 
 	IPv4_socket sock;
 };
 
-class IPv4_client : public IPv4_session_impl {
+class IPv4_client : virtual public IPv4_session_impl {
 public:
 	IPv4_client();
 	IPv4_client(IPv4_client const& other) = delete;
@@ -30,9 +31,11 @@ public:
 	~IPv4_client() = default;
 
 	void connect();
+	void send(std::string str);
+	std::string recv();
 };
 
-class IPv4_server : public IPv4_session_impl {
+class IPv4_server : virtual public IPv4_session_impl {
 public:
 	IPv4_server();
 	IPv4_server(IPv4_server const& other) = delete;
@@ -43,6 +46,8 @@ public:
 
 	void start();
 	void accept();
+	void send(std::string str);
+	std::string recv();
 private:
 	IPv4_socket connected_sock;
 };
