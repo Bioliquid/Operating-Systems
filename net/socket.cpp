@@ -6,9 +6,7 @@ IPv4_socket::IPv4_socket() :
 
 IPv4_socket::IPv4_socket(int fd_) :
 	fd(fd_)
-{
-	std::cout << "created socket " << fd << std::endl;
-}
+{}
 
 void IPv4_socket::swap(IPv4_socket &other) {
 	std::swap(fd, other.fd);
@@ -30,6 +28,7 @@ void IPv4_socket::create() {
 	fd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if(fd == -1) {
 		perror("socket() error");
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -48,12 +47,14 @@ void IPv4_socket::set_opt(int optname, struct timeval tv) {
 void IPv4_socket::bind(struct sockaddr_in addr) {
 	if(::bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr)) == -1) {
 		perror("bind() error");
+		exit(EXIT_FAILURE);
 	}
 }
 
 void IPv4_socket::listen() {
 	if(::listen(fd, 1) == -1) {
 		perror("listen() error");
+		exit(EXIT_FAILURE);
 	}
 }
 
