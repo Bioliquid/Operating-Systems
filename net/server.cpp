@@ -2,14 +2,17 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main(int argc, char **argv) {
 	IPv4_server server;
+	if (argc == 3) {
+		server.init(argv[1], argv[2]);
+	}
 	server.start();
+	server.accept();
 	while (true) {
-		server.accept();
 		std::string s =  server.recv();
 		std::cout << s << std::endl;
 		server.send(s);
 	}
-	server.close();
+
 }

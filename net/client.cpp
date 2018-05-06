@@ -2,8 +2,11 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main(int argc, char **argv) {
 	IPv4_client client;
+	if (argc == 3) {
+		client.init(argv[1], argv[2]);
+	}
 	client.connect();
 	std::string s;
 	while (true) {
@@ -12,5 +15,4 @@ int main() {
 		s = client.recv();
 		std::cout << s << std::endl;
 	}
-	client.close();
 }

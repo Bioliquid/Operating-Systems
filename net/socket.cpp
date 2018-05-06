@@ -6,17 +6,8 @@ IPv4_socket::IPv4_socket() :
 
 IPv4_socket::IPv4_socket(int fd_) :
 	fd(fd_)
-{}
-
-IPv4_socket::IPv4_socket(IPv4_socket const& other) {
-	fd = other.fd;
-}
-
-IPv4_socket& IPv4_socket::operator=(IPv4_socket const& other) {
-	if (this != &other) {
-		fd = other.fd;
-	}
-	return *this;
+{
+	std::cout << "created socket " << fd << std::endl;
 }
 
 void IPv4_socket::swap(IPv4_socket &other) {
@@ -32,7 +23,7 @@ IPv4_socket& IPv4_socket::operator=(IPv4_socket &&other) {
 }
 
 IPv4_socket::~IPv4_socket() {
-	//this->close();
+	this->close();
 }
 
 void IPv4_socket::create() {
@@ -77,7 +68,7 @@ IPv4_socket IPv4_socket::accept() {
     if(socket_ == -1) {
         perror("accept() error");
     }
-	return IPv4_socket(socket_);
+	return std::move(IPv4_socket(socket_));
 }
 
 void IPv4_socket::close() {
@@ -87,8 +78,21 @@ void IPv4_socket::close() {
 struct sockaddr_in sock::address(short sin_family, unsigned long addr, unsigned short port) {
 	struct sockaddr_in serveraddr;
 	serveraddr.sin_family = sin_family;
-	serveraddr.sin_addr.s_addr = addr;
+	serveraddr.sin_addr.s_addr = htonl(addr);
 	serveraddr.sin_port = htons(port);
+	memset(&(serveraddr.sin_zero), '\0', 8);
+	return serveraddr;	
+}
+
+struct sockaddr_in sock::address(short sin_family, std::string ip, std::string port) {
+	struct sockaddr_in serveraddr;
+	serveraddr.sin_family = sin_family;
+	serveraddr.sin_addr.s_addr = inet_addr(ip.c_str());
+	std::stringstream ss;
+	ss << port;
+	unsigned short prt;
+	ss >> prt;
+	serveraddr.sin_port = htons(prt);
 	memset(&(serveraddr.sin_zero), '\0', 8);
 	return serveraddr;	
 }

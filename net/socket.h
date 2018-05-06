@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <string>
 #include <string.h>
+#include <sstream>
 #include <sys/types.h>
 #include <time.h>
 #include <utility>
@@ -20,8 +21,8 @@ class IPv4_socket {
 public:
 	IPv4_socket();
 	explicit IPv4_socket(int fd);
-	IPv4_socket(IPv4_socket const& other);
-	IPv4_socket& operator=(IPv4_socket const& other);
+	IPv4_socket(IPv4_socket const& other) = delete;
+	IPv4_socket& operator=(IPv4_socket const& other) = delete;
 	IPv4_socket(IPv4_socket &&other);
 	IPv4_socket& operator=(IPv4_socket &&other);
 	~IPv4_socket();
@@ -46,6 +47,7 @@ private:
 
 namespace sock {
 	struct sockaddr_in address(short sin_family, unsigned long addr, unsigned short port);
+	struct sockaddr_in address(short sin_family, std::string ip, std::string port);
 	struct timeval timelimit(int seconds, int miliseconds);
 
 	std::string recv(IPv4_socket &socket);
