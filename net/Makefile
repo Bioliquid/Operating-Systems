@@ -1,4 +1,4 @@
-CXXFLAGS+=-Wall -std=c++11
+CXXFLAGS+=-Wall -std=c++17
 
 all: socket.o session.o client.o server.o
 	g++ socket.o session.o client.o -o sclient.o

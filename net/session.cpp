@@ -29,7 +29,7 @@ void IPv4_session_impl::send(IPv4_socket &socket, std::string str) {
 	this->send_impl(socket, str.c_str(), str.size());
 }
 
-std::string IPv4_session_impl::recv(IPv4_socket &socket)
+std::optional<std::string> IPv4_session_impl::recv(IPv4_socket &socket)
 {
 	return sock::recv(socket);
 }
@@ -76,7 +76,7 @@ void IPv4_server::send(std::string str) {
 	IPv4_session_impl::send(connected_sock, str);
 }
 
-std::string IPv4_server::recv() {
+std::optional<std::string> IPv4_server::recv() {
 	if (connected_sock == -1) {
 		std::cerr << "no connected socket" << std::endl;
 		return "";
@@ -97,6 +97,6 @@ void IPv4_client::send(std::string str) {
 	IPv4_session_impl::send(sock, str);
 }
 
-std::string IPv4_client::recv() {
+std::optional<std::string> IPv4_client::recv() {
 	return IPv4_session_impl::recv(sock);
 }

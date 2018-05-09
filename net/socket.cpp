@@ -61,6 +61,7 @@ void IPv4_socket::listen() {
 void IPv4_socket::connect(struct sockaddr_in addr) {
 	if(::connect(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr)) == -1) {
         perror("connect() error");
+		exit(EXIT_FAILURE);
     }
 }
 
@@ -105,7 +106,7 @@ struct timeval sock::timelimit(int seconds, int miliseconds) {
 	return tv;
 }
 
-std::string sock::recv(IPv4_socket &socket) {
+std::optional<std::string> sock::recv(IPv4_socket &socket) {
 	int fd = static_cast<int>(socket);
 
 	const size_t buffer_length = 1024;
@@ -116,11 +117,12 @@ std::string sock::recv(IPv4_socket &socket) {
 	if(recv_res == -1) {
 		perror("recv() error");
 		close(fd);
+		return {};
 	} else if (recv_res == 0 && errno != EAGAIN) {
 		shutdown(fd, SHUT_RDWR);
         close(fd);
         std::cout << "Connection terminated" << std::endl;
-		return "error";
+		return {};
 	}
 	return std::string(buffer);
 }

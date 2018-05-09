@@ -15,7 +15,7 @@ public:
 
 	void init(char *ip, char *prt);
 	void close();
-	std::string recv(IPv4_socket &socket);
+	std::optional<std::string> recv(IPv4_socket &socket);
 	void send(IPv4_socket &socket, std::string str);
 protected:
 	void send_impl(IPv4_socket &socket, const char* buffer, size_t length);
@@ -37,7 +37,7 @@ public:
 
 	void connect();
 	void send(std::string str);
-	std::string recv();
+	std::optional<std::string> recv();
 };
 
 class IPv4_server : virtual public IPv4_session_impl {
@@ -53,7 +53,7 @@ public:
 	void start();
 	void accept();
 	void send(std::string str);
-	std::string recv();
+	std::optional<std::string> recv();
 private:
 	IPv4_socket connected_sock;
 };

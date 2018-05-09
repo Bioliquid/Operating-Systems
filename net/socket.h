@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <utility>
+#include <optional>
 
 #define PORT 8080
 
@@ -50,6 +51,6 @@ namespace sock {
 	struct sockaddr_in address(short sin_family, std::string ip, std::string port);
 	struct timeval timelimit(int seconds, int miliseconds);
 
-	std::string recv(IPv4_socket &socket);
+	std::optional<std::string> recv(IPv4_socket &socket);
 	void send(IPv4_socket &socket, char const* buffer, size_t length);
 }

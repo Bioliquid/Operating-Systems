@@ -1,6 +1,7 @@
 #include "session.h"
 #include <iostream>
 #include <string>
+#include <optional>
 
 int main(int argc, char **argv) {
 	IPv4_client client;
@@ -8,11 +9,15 @@ int main(int argc, char **argv) {
 		client.init(argv[1], argv[2]);
 	}
 	client.connect();
-	std::string s;
+	std::string input;
+	std::optional<std::string> output;
 	while (true) {
-		std::cin >> s;
-		client.send(s);
-		s = client.recv();
-		std::cout << s << std::endl;
+		std::cin >> input;
+		client.send(input);
+		output = client.recv();
+		if (!output.has_value()) {
+			break;
+		}
+		std::cout << output.value() << std::endl;
 	}
 }
