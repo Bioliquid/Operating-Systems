@@ -79,7 +79,7 @@ void IPv4_server::send(std::string str) {
 std::optional<std::string> IPv4_server::recv() {
 	if (connected_sock == -1) {
 		std::cerr << "no connected socket" << std::endl;
-		return "";
+		return {};
 	}
 	std::optional<std::string> recv = IPv4_session_impl::recv(connected_sock);
 	if (!recv.has_value()) {
