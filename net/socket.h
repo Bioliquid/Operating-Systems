@@ -33,6 +33,7 @@ public:
 	}
 
 	void swap(IPv4_socket &other);
+	void reset();
 
 	void create();
 	void set_opt(int optname, int optval);

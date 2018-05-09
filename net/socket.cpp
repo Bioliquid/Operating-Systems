@@ -12,6 +12,10 @@ void IPv4_socket::swap(IPv4_socket &other) {
 	std::swap(fd, other.fd);
 }
 
+void IPv4_socket::reset() {
+	fd = -1;
+}
+
 IPv4_socket::IPv4_socket(IPv4_socket &&other) {
 	this->swap(other);
 }
