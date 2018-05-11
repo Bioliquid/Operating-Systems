@@ -7,6 +7,10 @@ int main(int argc, char **argv) {
 	IPv4_server server;
 	if (argc == 3) {
 		server.init(argv[1], argv[2]);
+	} else if (argc != 1) {
+		std::cout << "Usage:" << std::endl;
+		std::cout << "1.make server" << std::endl;
+		std::cout << "2.make server args=\"$ip $port\"" << std::endl;
 	}
 	server.start();
 	while (true) {

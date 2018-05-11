@@ -7,6 +7,10 @@ int main(int argc, char **argv) {
 	IPv4_client client;
 	if (argc == 3) {
 		client.init(argv[1], argv[2]);
+	} else if (argc != 1) {
+		std::cout << "Usage:" << std::endl;
+		std::cout << "1.make client" << std::endl;
+		std::cout << "2.make client args=\"$ip $port\"" << std::endl;
 	}
 	client.connect();
 	std::string input;
