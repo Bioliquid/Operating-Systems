@@ -92,8 +92,11 @@ struct sockaddr_in sock::address(short sin_family, unsigned long addr, unsigned 
 
 struct sockaddr_in sock::address(short sin_family, std::string ip, std::string port) {
 	struct sockaddr_in serveraddr;
+	if (inet_aton(ip.c_str(), &serveraddr.sin_addr) == 0) {
+		std::cerr << "Invalid ip address: " + ip << std::endl;
+		serveraddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);	
+	}
 	serveraddr.sin_family = sin_family;
-	serveraddr.sin_addr.s_addr = inet_addr(ip.c_str());
 	std::stringstream ss;
 	ss << port;
 	unsigned short prt;
@@ -113,11 +116,21 @@ struct timeval sock::timelimit(int seconds, int miliseconds) {
 std::optional<std::string> sock::recv(IPv4_socket &socket) {
 	int fd = static_cast<int>(socket);
 
-	const size_t buffer_length = 1024;
+	size_t buffer_length = 1024;
 	char buffer[buffer_length];
 	
 	//socket.set_opt(SO_RCVTIMEO, sock::timelimit(1, 0));
-	int recv_res = ::recv(fd, buffer, buffer_length, 0);	
+	ssize_t recv_res = 0;
+	size_t length = 0;
+	char *pbuffer = buffer;
+	while ((recv_res = ::recv(fd, pbuffer, buffer_length, 0)) > 0) {
+		length += recv_res;
+		buffer_length -= recv_res;
+		pbuffer += recv_res;
+		if (strlen(buffer) != length) {
+			break;
+		}
+	}
 	if(recv_res == -1) {
 		perror("recv() error");
 		close(fd);
@@ -133,7 +146,12 @@ std::optional<std::string> sock::recv(IPv4_socket &socket) {
 
 void sock::send(IPv4_socket &socket, char const* buffer, size_t length) {
 	int fd = static_cast<int>(socket);
-	if(::send(fd, buffer, length, MSG_NOSIGNAL) == -1) {
-		perror("send() error");
+	size_t send_res;
+	while (length > 0 && (send_res = ::send(fd, buffer, length, MSG_NOSIGNAL)) > 0) {
+		buffer += send_res;
+		length -= send_res;
+	}
+	if (length > 0) {
+		std::cerr << "Some data wan't send" << std::endl;
 	}
 }
