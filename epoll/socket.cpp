@@ -156,6 +156,6 @@ void sock::send(IPv4_socket &socket, char const* buffer, size_t length) {
 		length -= send_res;
 	}
 	if (length > 0) {
-		std::cerr << "Some data wan't send" << std::endl;
+		std::cerr << "Some data wasn't send" << std::endl;
 	}
 }
