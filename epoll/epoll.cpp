@@ -14,6 +14,10 @@ epoll::epoll(int num_events) :
 	}
 }
 
+epoll::~epoll() {
+	::close(epfd);
+}
+
 void epoll::create(int num_events) {
 	if (max_events > 0) {
 		return;

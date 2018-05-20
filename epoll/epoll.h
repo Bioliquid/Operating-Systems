@@ -18,6 +18,7 @@
 class epoll {
 public:
 	epoll();
+	~epoll();
 	explicit epoll(int num_events);
 	void create(int num_events);
 	void ctl(IPv4_socket &sock_, uint32_t events);
