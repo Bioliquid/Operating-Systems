@@ -31,7 +31,7 @@ IPv4_socket::~IPv4_socket() {
 }
 
 void IPv4_socket::create() {
-	fd = ::socket(AF_INET, SOCK_STREAM, 0);
+	fd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if(fd == -1) {
 		perror("socket() error");
 		exit(EXIT_FAILURE);
@@ -64,11 +64,12 @@ void IPv4_socket::listen() {
 	}
 }
 
-void IPv4_socket::connect(struct sockaddr_in addr) {
-	if(::connect(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr)) == -1) {
-        perror("connect() error");
-        exit(EXIT_FAILURE);
+int IPv4_socket::connect(struct sockaddr_in addr) {
+	int connection = ::connect(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr));
+	if(connection == -1 && errno == EINPROGRESS) {
+        return 1;
     }
+	return 0;
 }
 
 IPv4_socket IPv4_socket::accept() {

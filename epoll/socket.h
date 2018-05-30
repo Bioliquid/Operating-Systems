@@ -43,7 +43,7 @@ public:
 	void set_opt(int optname, struct timeval tv);
 	void bind(struct sockaddr_in addr);
 	void listen();
-	void connect(struct sockaddr_in addr);
+	int connect(struct sockaddr_in addr);
 	IPv4_socket accept();
 	void close();
 private:

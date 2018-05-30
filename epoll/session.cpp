@@ -128,12 +128,18 @@ void IPv4_client::connect() {
 	sock.create();
 	
 	epfd.create(max_events);
-	epfd.ctl(sock, EPOLLIN | EPOLLOUT);
+	
+	int connection;
 	
     if (ip_address == "") {
-		sock.connect(sock::address(AF_INET, INADDR_LOOPBACK, PORT));
+		connection = sock.connect(sock::address(AF_INET, INADDR_LOOPBACK, PORT));
 	} else {
-		sock.connect(sock::address(AF_INET, ip_address, port));
+		connection = sock.connect(sock::address(AF_INET, ip_address, port));
+	}
+	if (connection) {
+		epfd.ctl(sock, EPOLLIN | EPOLLOUT);
+	} else {
+		epfd.ctl(sock, EPOLLIN);
 	}
 } 
 
