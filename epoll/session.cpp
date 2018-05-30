@@ -126,11 +126,11 @@ std::optional<std::string> IPv4_server::recv(IPv4_socket &connected_sock) {
 
 void IPv4_client::connect() {
 	sock.create();
-	
+
 	epfd.create(max_events);
-	
+
 	int connection;
-	
+
     if (ip_address == "") {
 		connection = sock.connect(sock::address(AF_INET, INADDR_LOOPBACK, PORT));
 	} else {
